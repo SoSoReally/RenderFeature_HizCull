@@ -1,0 +1,33 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Mipmap
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float> _SoureceTex;
+RWTexture2D<float> _Result :register(u2);
+
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+[numthreads(8,8,1)]
+void Mipmap (uint2 id : SV_DispatchThreadID)
+{
+
+    //return;
+    uint2 orid = id*2;
+    float4 final_color = float4(0,0,0,0);
+    final_color.x = _SoureceTex[orid];
+    final_color.y = _SoureceTex[orid+uint2(0,1)];
+    final_color.z = _SoureceTex[orid+uint2(1,1)];
+    final_color.w = _SoureceTex[orid+uint2(1,0)];
+
+    //_Result[id] = _SoureceTex[orid]*20;
+    //return;
+    #if UNITY_REVERSED_Z
+    float x = min(final_color.x,final_color.y);
+    float y = min(final_color.z,final_color.w);
+    _Result[id] = min(x,y);
+    #else  
+    float x =  max(final_color.x,final_color.y);
+    float y = max(final_color.z,final_color.w);
+    _Result[id] = max(x,y);
+    #endif
+}

@@ -1,0 +1,93 @@
+﻿#pragma kernel CSMain
+#pragma kernel SampleTexture
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+StructuredBuffer<matrix> AllPositionBuffer;
+RWStructuredBuffer<matrix> visPositionBuffer;
+RWStructuredBuffer<uint> bufferArgs;
+
+Texture2D _HizDepthMipmap;
+
+SamplerState sampler_HizDepthMipmap;
+
+RWTexture2D<float4> Result;
+
+#define ThreadCountXY 25
+
+uint2 lengthX;
+
+matrix VP;
+
+float3 camerDir;
+
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+//总共线程DispatchCompute [25*arg1,25*arg2,1*arg3]
+[numthreads(ThreadCountXY,ThreadCountXY,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	uint index = id.x*lengthX.x*lengthX.y+id.y*lengthX.y+id.z;
+	//uint index = id.x * lengthX.x + id.z;
+	matrix M_Matrix = AllPositionBuffer[index];
+
+	float4 pos = float4(M_Matrix._m03, M_Matrix._m13, M_Matrix._m23, M_Matrix._m33);
+	float4 clipPos = mul(VP,float4(pos.xyz,1.0));
+
+	float2 xy = clipPos.xy/clipPos.w;
+
+	float rang = max(abs(xy.x),abs(xy.y));
+
+	float ndc_z = clipPos.z/clipPos.w;
+
+	//按照距离分mipmap
+	int mipmap = min(6, clipPos.w/(1000/6));
+	//mipmap = 0;
+	float2 uv = xy*0.5 + 0.5;
+
+	//uv.y = 1-uv.y;
+	//mipmap = 0;
+	float offest = 1.0/(512.0/pow(2.0,mipmap));
+	//float offest = 1.0/512.0;
+	//offest *=0.5;
+	float4 hizdepth = float4(
+	_HizDepthMipmap.SampleLevel(sampler_HizDepthMipmap,uv,mipmap,0).r,
+	_HizDepthMipmap.SampleLevel(sampler_HizDepthMipmap,uv+float2(0,offest),mipmap,0).r,
+	_HizDepthMipmap.SampleLevel(sampler_HizDepthMipmap,uv+float2(offest,offest),mipmap,0).r,
+	_HizDepthMipmap.SampleLevel(sampler_HizDepthMipmap,uv+float2(offest,0),mipmap,0).r);
+	
+	#if UNITY_REVERSED_Z
+		float hizd = min(min(hizdepth.x,hizdepth.y),min(hizdepth.z,hizdepth.w));
+	#else
+		float hizd = max(max(hizdepth.x,hizdepth.y),max(hizdepth.z,hizdepth.w));
+	#endif
+
+	float hd =	_HizDepthMipmap.SampleLevel(sampler_HizDepthMipmap,uv,mipmap,0).r;
+
+	//深度剔除, (nde_z*0.2)保证了深度与实际坐标点的微量误差带来的闪烁问题
+	if(ndc_z<hizd-(ndc_z*0.2))
+	{
+		return;
+	}
+
+	//剔除边界框扩展一点,避免部分模型再裁剪窗口内,坐标不在时被裁剪
+	if(rang>1+0.2)
+	{
+		return;
+	}
+
+	int currentID = 0;
+
+	InterlockedAdd(bufferArgs[1],1,currentID);
+	//
+	visPositionBuffer[currentID] = M_Matrix;
+
+}
+
+
+[numthreads(1,1,1)]
+void SampleTexture(uint3 id : SV_DispatchThreadID)
+{
+
+	float hizdepth = _HizDepthMipmap.SampleLevel(sampler_HizDepthMipmap,id.xy/512.0,0,0).r;
+	Result[id.xy] = float4(hizdepth,1,1,1);
+}

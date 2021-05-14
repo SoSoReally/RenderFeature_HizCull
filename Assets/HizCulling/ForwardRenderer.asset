@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6149188529444934093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6b4e6743fb29a14cb5b70576dd4e976, type: 3}
+  m_Name: NewTestFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  CRPD:
+    Enable: 0
+    mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 3}
+    material: {fileID: 2100000, guid: 3130240d66fb59a4f99c75bf97689001, type: 2}
+    matrix4X4:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    rpe: 300
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
+  m_Name: ForwardRenderer
+  m_EditorClassIdentifier: 
+  m_RendererFeatures:
+  - {fileID: 7768264775277463399}
+  m_RendererFeatureMap: 67c797b3a76bce6b
+  postProcessData: {fileID: 0}
+  xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
+  shaders:
+    blitPS: {fileID: 4800000, guid: c17132b1f77d20942aa75f8429c0f8bc, type: 3}
+    copyDepthPS: {fileID: 4800000, guid: d6dae50ee9e1bfa4db75f19f99355220, type: 3}
+    screenSpaceShadowPS: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
+    samplingPS: {fileID: 4800000, guid: 04c410c9937594faa893a11dceb85f7e, type: 3}
+    stencilDeferredPS: {fileID: 4800000, guid: e9155b26e1bc55942a41e518703fe304, type: 3}
+    fallbackErrorPS: {fileID: 4800000, guid: e6e9a19c3678ded42a3bc431ebef7dbd, type: 3}
+    materialErrorPS: {fileID: 4800000, guid: 5fd9a8feb75a4b5894c241777f519d4e, type: 3}
+  m_OpaqueLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_TransparentLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_DefaultStencilState:
+    overrideStencilState: 0
+    stencilReference: 0
+    stencilCompareFunction: 8
+    passOperation: 0
+    failOperation: 0
+    zFailOperation: 0
+  m_ShadowTransparentReceive: 1
+  m_RenderingMode: 0
+  m_AccurateGbufferNormals: 1
+--- !u!114 &7768264775277463399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ca57b80e9ff0b74098eb6a6eb5da0d5, type: 3}
+  m_Name: OneHizCullRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  m_HizCullSetting:
+    Enable: 1
+    Update: 0
+    Density: 1
+    TargetMesh: {fileID: 329863732325012486, guid: 8a098bb8754ce0c49b4a39339c446085, type: 3}
+    TargetMaterial: {fileID: 2100000, guid: 50b92dcaaf6dcc74987a4b3a212343e0, type: 2}
+    CullShader: {fileID: 7200000, guid: 219be535b8850254282c913387919b1d, type: 3}
+    GenerateMipmap: {fileID: 7200000, guid: ea5bd9ab12c8b8f4982a2a03b819b370, type: 3}
+    Terrain: {fileID: 15600000, guid: d58879db204ec924a8d3e5fa6330c183, type: 2}
+    Toggle: 1
+    RandomValue: {x: 0, y: 0}
+    GameDepthTempRT: {fileID: 0}
+  HizCull: 0
+  HizCullDraw: 300
+  HizCullShadow: 100
+  EventOffest: 6
